@@ -1,11 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-	<title>Pastebin</head>
+	<title>Pastebin</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
 	<script type="text/javascript" src="pastes.js"></script>
 </head>
 <body>
-
+	<div id="content">
+		<header>
+			<h1>Pastebin</h1>
+		</header>
+		<form id="newPaste">
+			<textarea id="paste" rows="5" cols="20"></textarea>
+			<input type="submit" value="Create" />
+		</form>
+	</div>
 </body>
 </html>
