@@ -12,7 +12,6 @@ body{
 }
 
 header{
-	color: white;
 	background-color: #333;
 	border: 2px solid #111;
 	border-top-left-radius: 15px;
@@ -23,16 +22,21 @@ h1{
 	margin: 1em;
 }
 
+header a, header a:visited{
+	color: white;
+	text-decoration: none;
+}
+
 .clear{
 	clear: both;
 }
 
 form, #content{
 	float: left;
-	width: 675px;
+	width: 670px;
 }
 
-form{
+#newPaste{
 	margin-top: 1em;
 }
 
@@ -40,7 +44,7 @@ form{
 	display: none;
 }
 
-#content pre{
+#content pre, #content .syntaxhighlighter{
 	max-width: 675px;
 	white-space: pre-wrap;
 }
@@ -49,7 +53,7 @@ form{
 	font-style: italic;
 }
 
-label{
+#newPaste label{
 	display: inline-block;
 	width: 50px;
 	text-align: center;
@@ -59,7 +63,7 @@ label{
 	width: 600px;
 }
 
-textarea{
+#newPaste textarea{
 	width: 650px;
 }
 

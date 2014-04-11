@@ -1,3 +1,24 @@
+var brushes = {
+	"plain": "shBrushPlain",
+	"as3": "shBrushAS3",
+	"bash": "shBrushBash",
+	"csharp": "shBrushCSharp",
+	"cpp": "shBrushCpp",
+	"css": "shBrushCss",
+	"diff": "shBrushDiff",
+	"js": "shBrushJScript",
+	"java": "shBrushJava",
+	"pl": "shBrushPerl",
+	"php": "shBrushPhp",
+	"ps": "shBrushPowerShell",
+	"py": "shBrushPython",
+	"ruby": "shBrushRuby",
+	"scala": "shBrushScala",
+	"sql": "shBrushSql",
+	"vb": "shBrushVb",
+	"xml": "shBrushXml"
+};
+
 $(function(){
 	getRecentPastes();
 
@@ -12,11 +33,13 @@ $(function(){
 
 		var text = $("#paste").val();
 		var title = $("#title").val();
+		var type = $("#type").val();
 		$.ajax({
 			type: "POST",
 			url: "rs/pastes/new",
 			data: JSON.stringify({
 				title: title,
+				type: type,
 				text: text
 			}),
 			contentType: "application/json; charset=utf-8",
@@ -56,19 +79,24 @@ function loadPaste(id){
 
 			document.title = res.title + " - Pastebin";
 
-    		var $title = $("<h2>");
-    		$title.text(res.title);
-    		$("#content").append($title);
+			var scriptURL = "syntaxhighlighter/scripts/" + brushes[res.type] + ".js";
+			$.getScript(scriptURL, function(){
+				var $title = $("<h2>");
+				$title.text(res.title);
+				$("#content").append($title);
 
-			var $time = $("<div>");
-    		$time.addClass("time");
-    		$time.text(new Date(res.created).toLocaleString());
-    		$("#content").append($time);
+				var $time = $("<div>");
+				$time.addClass("time");
+				$time.text(new Date(res.created).toLocaleString());
+				$("#content").append($time);
 
-			var $text = $("<pre>");
-    		$text.addClass("text");
-    		$text.text(res.text);
-    		$("#content").append($text);
+				var $text = $("<pre>");
+				$text.addClass("brush: " + res.type);
+				$text.text(res.text);
+				$("#content").append($text);
+
+				SyntaxHighlighter.highlight();
+			});
 	    },
 	    failure: error
 	});

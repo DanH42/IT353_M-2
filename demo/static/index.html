@@ -3,18 +3,41 @@
 <head>
 	<title>Pastebin</title>
 	<link rel="stylesheet" type="text/css" href="style.css" />
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
-	<script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+	<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shCore.css"/>
+	<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shThemeDefault.css"/>
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.1.0/jquery.min.js"></script>
+	<script type="text/javascript" src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.5.1/moment.min.js"></script>
+	<script type="text/javascript" src="syntaxhighlighter/scripts/shCore.js"></script>
 	<script type="text/javascript" src="pastes.js"></script>
 </head>
 <body>
 	<div id="container">
 		<header>
-			<h1>Pastebin</h1>
+			<h1><a href=".">Pastebin</a></h1>
 		</header>
 		<form id="newPaste">
 			<label for="title">Title: </label><input type="text" id="title" /><br />
-			<textarea id="paste" rows="5" cols="20"></textarea><br />
+			<textarea id="paste" rows="15" cols="20"></textarea><br />
+			Type: <select id="type">
+				<option value="plain">Plain Text</option>
+				<option value="as3">ActionScript</option>
+				<option value="bash">Bash</option>
+				<option value="csharp">C#</option>
+				<option value="cpp">C++</option>
+				<option value="css">CSS</option>
+				<option value="diff">Diff</option>
+				<option value="js">Javascript</option>
+				<option value="java">Java</option>
+				<option value="pl">Perl</option>
+				<option value="php">PHP</option>
+				<option value="ps">PowerShell</option>
+				<option value="py">Python</option>
+				<option value="ruby">Ruby</option>
+				<option value="scala">Scala</option>
+				<option value="sql">SQL</option>
+				<option value="vb">Visual Basic</option>
+				<option value="xml">XML</option>
+			</select>
 			<input type="submit" value="Create" />
 		</form>
 		<div id="content"></div>

@@ -13,6 +13,10 @@ app.configure(function(){
 
 app.listen(8080);
 
+// Available highlighting languages
+var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
+	"java", "pl", "php", "ps", "py", "ruby", "scala", "sql", "vb", "xml"];
+
 function create_new_id(){
 	return Math.random().toString(16).substr(2);
 }
@@ -23,6 +27,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 			response.send({
 				success: true,
 				id: paste.id,
+				type: paste.type,
 				text: paste.text,
 				title: paste.title,
 				created: paste.created
@@ -48,6 +53,7 @@ app.get('/rs/pastes/recent/:num', function(request, response){
 				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
 				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
 				output.push({
+					type: pastes[i].type,
 					text: text,
 					id: pastes[i].id,
 					title: pastes[i].title,
@@ -74,6 +80,10 @@ app.post('/rs/pastes/new', function(request, response){
 	if(text.trim().length > 0){
 		var id = create_new_id();
 
+		var type = request.body.type;
+		if(!type || brushes.indexOf(type) === -1)
+			type = brushes[0];
+
 		var title = request.body.title;
 		if(title && title.trim().length > 0)
 			title = title.trim();
@@ -82,6 +92,7 @@ app.post('/rs/pastes/new', function(request, response){
 
 		var dataToInsert = {
 			id: id,
+			type: type,
 			text: text,
 			title: title,
 			created: +new Date
