@@ -2,11 +2,51 @@ body{
 	font-family: Arial, Helvetica, sans-serif;
 }
 
-#content{
+#container{
 	max-width: 900px;
 	margin: auto;
 }
 
+header{
+	background-color: #eee;
+	border: 1px solid #eee;
+}
+
+form, #content{
+	float: left;
+	width: 80%;
+}
+
+#content{
+	display: none;
+}
+
+#title{
+	width: 500px;
+}
+
 textarea{
 	width: 100%;
+}
+
+#sidebar{
+	float: right;
+	width: 19%;
+}
+
+#sidebar .recentPaste{
+	margin: 1em 0;
+}
+
+#sidebar .recentPaste .time{
+	color: #666;
+	font-size: 90%;
+}
+
+#sidebar .recentPaste .text{
+	margin: 0;
+	white-space: nowrap;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	height: 1em;
 }

@@ -8,15 +8,103 @@ db.pastes = mdb.collection("pastes");
 app.configure(function(){
 	app.use(express.compress());
 	app.use(express.static(__dirname + '/static'));
+	app.use(express.json());
 });
 
 app.listen(8080);
 
-app.get('/rs/pastes/paste', function(req, res){
-	res.send("This was a GET.");
+function create_new_id(){
+	return Math.random().toString(16).substr(2);
+}
+
+app.get('/rs/pastes/paste/:id', function(request, response){
+	db.pastes.findOne({id: request.params.id}, function(error, paste){
+		if(paste && !error){
+			response.send({
+				success: true,
+				id: paste.id,
+				text: paste.text,
+				title: paste.title,
+				created: paste.created
+			});
+		}else{
+			response.send({
+				success: false,
+				error: "No such paste!"
+			});
+		}
+	});
 });
 
-app.post('/rs/pastes/paste', function(req, res){
-	res.send("This was a POST.");
+app.get('/rs/pastes/recent/:num', function(request, response){
+	var cursor = db.pastes.find();    // Look up all pastes
+	cursor.sort({created: -1});       // Sort by creation date
+	cursor.limit(request.params.num); // Limit to max number
+	cursor.toArray(function(error, pastes){
+		if(pastes && !error){
+			var output = [];
+			for(var i = 0; i < pastes.length; i++){
+				var text = pastes[i].text.substr(0, 100);   // Shortened preview
+				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
+				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
+				output.push({
+					text: text,
+					id: pastes[i].id,
+					title: pastes[i].title,
+					created: pastes[i].created
+				});
+			}
+
+			response.send({
+				success: true,
+				pastes: output
+			});
+		}else{
+			console.log(error);
+			response.send({
+				success: false,
+				error: "Couldn't load any pastes!"
+			});
+		}
+	});
 });
 
+app.post('/rs/pastes/new', function(request, response){
+	var text = request.body.text;
+	if(text.trim().length > 0){
+		var id = create_new_id();
+
+		var title = request.body.title;
+		if(title && title.trim().length > 0)
+			title = title.trim();
+		else
+			title = text.split("\n")[0].trim().substr(0, 20); // First line of text
+
+		var dataToInsert = {
+			id: id,
+			text: text,
+			title: title,
+			created: +new Date
+		};
+
+		db.pastes.insert(dataToInsert, function(error){
+			if(error){
+				console.log(error);
+				response.send({
+					success: false,
+					error: "Unknown database error."
+				});
+			}else{
+				response.send({
+					success: true,
+					id: id
+				});
+			}
+		});
+	}else{
+		response.send({
+			success: false,
+			error: "No text given!"
+		});
+	}
+});
