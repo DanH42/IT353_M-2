@@ -116,3 +116,15 @@ header a, header a:visited{
 	overflow: hidden;
 	text-overflow: ellipsis;
 }
+
+.error{
+	position: fixed;
+	left: 0;
+	right: 0;
+	bottom: -2em;
+	background-color: #cc0000;
+	color: white;
+	font-weight: bold;
+	text-align: center;
+	padding: .5em;
+}

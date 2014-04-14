@@ -45,9 +45,9 @@ $(function(){
 					if(res && res.success)
 						window.location = ".";
 					else
-						error();
+						error(res.error || "Unable to delete paste.");
 				},
-				failure: error
+				failure: error.bind(this, "Unable to delete paste.")
 			});
 		});
 
@@ -76,9 +76,9 @@ $(function(){
 					savePassword(res.id, res.pass);
 					window.location = "?id=" + res.id;
 				}else
-					error();
+					error(res.error || "Unable to create new paste.");
 			},
-			failure: error
+			failure: error.bind(this, "Unable to create new paste.")
 		});
 	});
 });
@@ -114,7 +114,7 @@ function loadPaste(id){
 	    dataType: "json",
 	    success: function(res){
 	    	if(!res || !res.success)
-	    		return error();
+	    		return error(res.error || "Unable to load paste.");
 
 			document.title = res.title + " - Pastebin";
 
@@ -137,7 +137,7 @@ function loadPaste(id){
 				SyntaxHighlighter.highlight();
 			});
 	    },
-	    failure: error
+	    failure: error.bind(this, "Unable to load paste.")
 	});
 }
 
@@ -149,7 +149,7 @@ function getRecentPastes(){
 	    dataType: "json",
 	    success: function(res){
 	    	if(!res || !res.success)
-	    		return error();
+	    		return error(res.error || "Unable to load recent pastes.");
 	    	$("#recent").html("");
 	    	for(var i = 0; i < res.pastes.length; i++){
 	    		var $div = $("<div>");
@@ -174,10 +174,19 @@ function getRecentPastes(){
 	    		$("#recent").append($div);
 	    	}
 	    },
-	    failure: error
+	    failure: error.bind(this, "Unable to load recent pastes.")
 	});
 }
 
-function error(){
-	alert("All is lost. The end is here.");
+function error(text){
+	var $err = $(document.createElement('div'));
+	$err.addClass("error").text(text);
+	$(document.body).append($err);
+	$err.animate({"bottom": "0em"}, function(){
+		setTimeout(function(){
+			$err.animate({"bottom": "-2em"}, function(){
+				$err.remove();
+			});
+		}, 2000);
+	});
 }
