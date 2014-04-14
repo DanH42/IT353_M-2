@@ -25,6 +25,10 @@ function create_new_password(){
 	return Math.random().toString(36).substr(2);
 }
 
+/*
+@GET
+@Path("paste/{id}")
+*/
 app.get('/rs/pastes/paste/:id', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
 		if(paste && !error){
@@ -45,6 +49,10 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 	});
 });
 
+/*
+@GET
+@Path("recent/{num}")
+*/
 app.get('/rs/pastes/recent/:num', function(request, response){
 	var cursor = db.pastes.find();    // Look up all pastes
 	cursor.sort({created: -1});       // Sort by creation date
@@ -79,6 +87,10 @@ app.get('/rs/pastes/recent/:num', function(request, response){
 	});
 });
 
+/*
+@POST
+@Path("new")
+*/
 app.post('/rs/pastes/new', function(request, response){
 	var text = request.body.text;
 	if(text.trim().length > 0){
@@ -128,6 +140,10 @@ app.post('/rs/pastes/new', function(request, response){
 	}
 });
 
+/*
+@DELETE
+@Path("paste/{id}/{pass}")
+*/
 app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
 		if(paste && !error){
