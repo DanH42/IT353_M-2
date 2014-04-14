@@ -88,7 +88,7 @@ app.post('/rs/pastes/new', function(request, response){
 		if(title && title.trim().length > 0)
 			title = title.trim();
 		else
-			title = text.split("\n")[0].trim().substr(0, 20); // First line of text
+			title = text.split("\n")[0].trim().substr(0, 50); // First line of text
 
 		var dataToInsert = {
 			id: id,
