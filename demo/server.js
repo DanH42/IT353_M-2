@@ -21,6 +21,10 @@ function create_new_id(){
 	return Math.random().toString(16).substr(2);
 }
 
+function create_new_password(){
+	return Math.random().toString(36).substr(2);
+}
+
 app.get('/rs/pastes/paste/:id', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
 		if(paste && !error){
@@ -90,11 +94,14 @@ app.post('/rs/pastes/new', function(request, response){
 		else
 			title = text.split("\n")[0].trim().substr(0, 50); // First line of text
 
+		var deletionPassword = create_new_password();
+
 		var dataToInsert = {
 			id: id,
 			type: type,
 			text: text,
 			title: title,
+			pass: deletionPassword,
 			created: +new Date
 		};
 
@@ -108,7 +115,8 @@ app.post('/rs/pastes/new', function(request, response){
 			}else{
 				response.send({
 					success: true,
-					id: id
+					id: id,
+					pass: deletionPassword
 				});
 			}
 		});
@@ -118,4 +126,35 @@ app.post('/rs/pastes/new', function(request, response){
 			error: "No text given!"
 		});
 	}
+});
+
+app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
+	db.pastes.findOne({id: request.params.id}, function(error, paste){
+		if(paste && !error){
+			if(request.params.pass === paste.pass){
+				db.pastes.remove({id: request.params.id}, function(error){
+					if(error){
+						response.send({
+							success: false,
+							error: "Unknown database error."
+						});
+					}else{
+						response.send({
+							success: true
+						});
+					}
+				});
+			}else{
+				response.send({
+					success: false,
+					error: "Incorrect password."
+				});
+			}
+		}else{
+			response.send({
+				success: false,
+				error: "No such paste!"
+			});
+		}
+	});
 });

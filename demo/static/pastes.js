@@ -19,11 +19,38 @@ var brushes = {
 	"xml": "shBrushXml"
 };
 
+var currentID;
+
 $(function(){
 	getRecentPastes();
 
 	var query = getURLQuery();
 	if(query.id){
+		$("#deleteLink").click(function(){
+			$("#deleteLink").hide();
+			$("#deletePaste").show();
+			return false;
+		});
+
+		$("#deletePaste").submit(function(e){
+			e.preventDefault();
+		
+			var pass = $("#deletePass").val();
+			$.ajax({
+				type: "DELETE",
+				url: "rs/pastes/paste/" + currentID + "/" + encodeURIComponent(pass),
+				contentType: "application/json; charset=utf-8",
+				dataType: "json",
+				success: function(res){
+					if(res && res.success)
+						window.location = ".";
+					else
+						error();
+				},
+				failure: error
+			});
+		});
+
 		loadPaste(query.id);
 		return;
 	}
@@ -45,9 +72,10 @@ $(function(){
 			contentType: "application/json; charset=utf-8",
 			dataType: "json",
 			success: function(res){
-				if(res && res.success)
+				if(res && res.success){
+					savePassword(res.id, res.pass);
 					window.location = "?id=" + res.id;
-				else
+				}else
 					error();
 			},
 			failure: error
@@ -56,18 +84,29 @@ $(function(){
 });
 
 function getURLQuery(){
-	var things = {}
+	var params = {}
 	var parts = window.location.search.substr(1).split("&");
 	for(var i = 0; i < parts.length; i++){
-		var thing = parts[i].split("=");
-		things[decodeURIComponent(thing[0])] = decodeURIComponent(thing[1]);
+		var param = parts[i].split("=");
+		params[decodeURIComponent(param[0])] = decodeURIComponent(param[1]);
 	}
-	return things;
+	return params;
+}
+
+function savePassword(id, pass){
+	localStorage[id] = pass;
+}
+
+function getPassword(id){
+	return localStorage[id];
 }
 
 function loadPaste(id){
+	currentID = id;
+
 	$("#newPaste").hide();
-	$("#content").html("").show();
+	$("#content").show();
+
 	$.ajax({
 	    type: "GET",
 	    url: "rs/pastes/paste/" + id,
@@ -81,19 +120,19 @@ function loadPaste(id){
 
 			var scriptURL = "syntaxhighlighter/scripts/" + brushes[res.type] + ".js";
 			$.getScript(scriptURL, function(){
-				var $title = $("<h2>");
+				var $title = $("#content .title");
 				$title.text(res.title);
-				$("#content").append($title);
 
-				var $time = $("<div>");
-				$time.addClass("time");
+				var $time = $("#content .time");
 				$time.text(new Date(res.created).toLocaleString());
-				$("#content").append($time);
 
-				var $text = $("<pre>");
+				var pass = getPassword(res.id);
+				if(pass)
+					$("#deletePass").val(pass);
+
+				var $text = $("#content .text");
 				$text.addClass("brush: " + res.type);
 				$text.text(res.text);
-				$("#content").append($text);
 
 				SyntaxHighlighter.highlight();
 			});

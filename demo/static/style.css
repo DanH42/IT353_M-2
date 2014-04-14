@@ -31,7 +31,7 @@ header a, header a:visited{
 	clear: both;
 }
 
-form, #content{
+#newPaste, #content{
 	float: left;
 	width: 670px;
 }
@@ -45,12 +45,36 @@ form, #content{
 }
 
 #content h2{
-	margin: .5em;
+	margin: .5em .5em 0 .5em;
+}
+
+#content .subhead{
+	margin: 0em 1em 1em 1em;
 }
 
 #content .time{
+	color: #666;
 	font-style: italic;
-	margin: 1em;
+	float: left;
+}
+
+#deleteLink{
+	float: right;
+}
+
+#deletePaste{
+	display: none;
+	float: right;
+}
+
+#deletePaste input{
+	margin: 0;
+	border: 1px solid gray;
+	border-radius: 0px;
+}
+
+#deletePaste input[type="submit"]{
+	margin-left: -1px;
 }
 
 #content pre, #content .syntaxhighlighter{

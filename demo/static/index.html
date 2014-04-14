@@ -40,7 +40,18 @@
 			</select>
 			<input type="submit" value="Create" />
 		</form>
-		<div id="content"></div>
+		<div id="content">
+			<h2 class="title"></h2>
+			<div class="subhead">
+				<div class="time"></div>
+				<a href="#" id="deleteLink">Delete</a>
+				<form id="deletePaste">
+					<input type="text" id="deletePass" placeholder="Password" /><input type="submit" value="Delete" />
+				</form>
+				<div class="clear"></div>
+			</div>
+			<pre class="text"></pre>
+		</div>
 		<div id="sidebar">
 			<h3>Recent Pastes</h3>
 			<div id="recent"></div>
