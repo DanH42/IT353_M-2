@@ -116,7 +116,10 @@ function loadPaste(id){
 	    	if(!res || !res.success)
 	    		return error(res.error || "Unable to load paste.");
 
-			document.title = res.title + " - Pastebin";
+			var type = "";
+			if(res.type !== "plain")
+				type = "[" + $("#type option[value='" + res.type + "']").text() + "] ";
+			document.title = type + res.title + " - Pastebin";
 
 			var scriptURL = "syntaxhighlighter/scripts/" + brushes[res.type] + ".js";
 			$.getScript(scriptURL, function(){
