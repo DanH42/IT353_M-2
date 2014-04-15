@@ -7,7 +7,7 @@ db.pastes = mdb.collection("pastes");
 
 app.configure(function(){
 	app.use(express.compress());
-	app.use(express.static(__dirname + '/static'));
+	app.use(express.static(__dirname + '/WebContent'));
 	app.use(express.json());
 });
 
