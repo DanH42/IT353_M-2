@@ -13,7 +13,7 @@ body{
 
 header{
 	background-color: #333;
-	border: 2px solid #111;
+	border: 2px solid #333;
 	border-top-left-radius: 15px;
 	border-top-right-radius: 15px;
 }
@@ -31,7 +31,13 @@ header a, header a:visited{
 	clear: both;
 }
 
-#newPaste, #content{
+#newPaste{
+	float: left;
+	width: 660px;
+	margin-left: 10px;
+}
+
+#content{
 	float: left;
 	width: 670px;
 }
