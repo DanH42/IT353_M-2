@@ -127,7 +127,7 @@ function loadPaste(id){
 				$title.text(res.title);
 
 				var $time = $("#content .time");
-				$time.text(new Date(res.created).toLocaleString());
+				$time.text(new Date(res.updated).toLocaleString());
 
 				var pass = getPassword(res.id);
 				if(pass)
@@ -166,7 +166,7 @@ function getRecentPastes(){
 
 				var $time = $("<div>");
 	    		$time.addClass("time");
-	    		$time.text(moment(res.pastes[i].created).fromNow());
+	    		$time.text(moment(res.pastes[i].updated).fromNow());
 	    		$div.append($time);
 
 				var $text = $("<pre>");

@@ -38,7 +38,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 				type: paste.type,
 				text: paste.text,
 				title: paste.title,
-				created: paste.created
+				updated: paste.updated
 			});
 		}else{
 			response.send({
@@ -55,7 +55,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 */
 app.get('/rs/pastes/recent/:num', function(request, response){
 	var cursor = db.pastes.find();    // Look up all pastes
-	cursor.sort({created: -1});       // Sort by creation date
+	cursor.sort({updated: -1});       // Sort by creation date
 	cursor.limit(request.params.num); // Limit to max number
 	cursor.toArray(function(error, pastes){
 		if(pastes && !error){
@@ -69,7 +69,7 @@ app.get('/rs/pastes/recent/:num', function(request, response){
 					text: text,
 					id: pastes[i].id,
 					title: pastes[i].title,
-					created: pastes[i].created
+					updated: pastes[i].updated
 				});
 			}
 
@@ -106,15 +106,15 @@ app.post('/rs/pastes/new', function(request, response){
 		else
 			title = text.split("\n")[0].trim().substr(0, 50); // First line of text
 
-		var deletionPassword = create_new_password();
+		var password = create_new_password();
 
 		var dataToInsert = {
 			id: id,
 			type: type,
 			text: text,
 			title: title,
-			pass: deletionPassword,
-			created: +new Date
+			pass: password,
+			updated: +new Date
 		};
 
 		db.pastes.insert(dataToInsert, function(error){
@@ -128,7 +128,7 @@ app.post('/rs/pastes/new', function(request, response){
 				response.send({
 					success: true,
 					id: id,
-					pass: deletionPassword
+					pass: password
 				});
 			}
 		});
@@ -138,6 +138,71 @@ app.post('/rs/pastes/new', function(request, response){
 			error: "No text given!"
 		});
 	}
+});
+
+/*
+@PUT
+@Path("paste/{id}")
+*/
+app.put('/rs/pastes/paste/:id/:pass', function(request, response){
+	var text = request.body.text;
+	var id = request.params.id;
+	db.pastes.findOne({id: request.params.id}, function(error, paste){
+		if(paste && !error){
+			if(request.params.pass === paste.pass){
+				if(text.trim().length > 0){
+
+					var type = request.body.type;
+					if(!type || brushes.indexOf(type) === -1)
+						type = brushes[0];
+
+					var title = request.body.title;
+					if(title && title.trim().length > 0)
+						title = title.trim();
+					else
+						title = text.split("\n")[0].trim().substr(0, 50); // First line of text
+
+					var dataToInsert = {
+						type: type,
+						text: text,
+						title: title,
+						updated: +new Date
+					};
+
+					db.pastes.update({id: id}, {$set: dataToInsert}, function(error){
+						if(error){
+							console.log(error);
+							response.send({
+								success: false,
+								error: "Unknown database error."
+							});
+						}else{
+							response.send({
+								success: true,
+								id: id,
+								pass: deletionPassword
+							});
+						}
+					});
+				}else{
+					response.send({
+						success: false,
+						error: "No text given!"
+					});
+				}
+			}else{
+				response.send({
+					success: false,
+					error: "Incorrect password."
+				});
+			}
+		}else{
+			response.send({
+				success: false,
+				error: "No such paste!"
+			});
+		}
+	});
 });
 
 /*
