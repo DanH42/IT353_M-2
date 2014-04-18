@@ -17,14 +17,6 @@ app.listen(8080);
 var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 	"java", "pl", "php", "ps", "py", "ruby", "scala", "sql", "vb", "xml"];
 
-function create_new_id(){
-	return Math.random().toString(16).substr(2);
-}
-
-function create_new_password(){
-	return Math.random().toString(36).substr(2);
-}
-
 /*
 @GET
 @Path("paste/{id}")
@@ -40,12 +32,8 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 				title: paste.title,
 				updated: paste.updated
 			});
-		}else{
-			response.send({
-				success: false,
-				error: "No such paste!"
-			});
-		}
+		}else
+			send_error(response, "No such paste!");
 	});
 });
 
@@ -77,13 +65,8 @@ app.get('/rs/pastes/recent/:num', function(request, response){
 				success: true,
 				pastes: output
 			});
-		}else{
-			console.log(error);
-			response.send({
-				success: false,
-				error: "Couldn't load any pastes!"
-			});
-		}
+		}else
+			send_error(response, "Couldn't load any pastes!");
 	});
 });
 
@@ -100,12 +83,7 @@ app.post('/rs/pastes/new', function(request, response){
 		if(!type || brushes.indexOf(type) === -1)
 			type = brushes[0];
 
-		var title = request.body.title;
-		if(title && title.trim().length > 0)
-			title = title.trim();
-		else
-			title = text.split("\n")[0].trim().substr(0, 50); // First line of text
-
+		var title = get_title(request.body.title, text);
 		var password = create_new_password();
 
 		var dataToInsert = {
@@ -120,10 +98,7 @@ app.post('/rs/pastes/new', function(request, response){
 		db.pastes.insert(dataToInsert, function(error){
 			if(error){
 				console.log(error);
-				response.send({
-					success: false,
-					error: "Unknown database error."
-				});
+				send_error(response, "Unknown database error.");
 			}else{
 				response.send({
 					success: true,
@@ -132,12 +107,8 @@ app.post('/rs/pastes/new', function(request, response){
 				});
 			}
 		});
-	}else{
-		response.send({
-			success: false,
-			error: "No text given!"
-		});
-	}
+	}else
+		send_error(response, "No text given!");
 });
 
 /*
@@ -156,11 +127,7 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 					if(!type || brushes.indexOf(type) === -1)
 						type = brushes[0];
 
-					var title = request.body.title;
-					if(title && title.trim().length > 0)
-						title = title.trim();
-					else
-						title = text.split("\n")[0].trim().substr(0, 50); // First line of text
+					var title = get_title(request.body.title, text);
 
 					var dataToInsert = {
 						type: type,
@@ -172,10 +139,7 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 					db.pastes.update({id: id}, {$set: dataToInsert}, function(error){
 						if(error){
 							console.log(error);
-							response.send({
-								success: false,
-								error: "Unknown database error."
-							});
+							send_error(response, "Unknown database error.");
 						}else{
 							response.send({
 								success: true,
@@ -184,24 +148,12 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 							});
 						}
 					});
-				}else{
-					response.send({
-						success: false,
-						error: "No text given!"
-					});
-				}
-			}else{
-				response.send({
-					success: false,
-					error: "Incorrect password."
-				});
-			}
-		}else{
-			response.send({
-				success: false,
-				error: "No such paste!"
-			});
-		}
+				}else
+					send_error(response, "No text given!");
+			}else
+				send_error(response, "Incorrect password.");
+		}else
+			send_error(response, "No such paste!");
 	});
 });
 
@@ -215,27 +167,35 @@ app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
 			if(request.params.pass === paste.pass){
 				db.pastes.remove({id: request.params.id}, function(error){
 					if(error){
-						response.send({
-							success: false,
-							error: "Unknown database error."
-						});
-					}else{
-						response.send({
-							success: true
-						});
-					}
+						console.log(error);
+						send_error(response, "Unknown database error.");
+					}else
+						response.send({success: true});
 				});
-			}else{
-				response.send({
-					success: false,
-					error: "Incorrect password."
-				});
-			}
-		}else{
-			response.send({
-				success: false,
-				error: "No such paste!"
-			});
-		}
+			}else
+				send_error(response, "Incorrect password.");
+		}else
+			send_error(response, "No such paste!");
 	});
 });
+
+function send_error(response, message){
+	response.send({
+		success: false,
+		error: message
+	});
+}
+
+function create_new_id(){
+	return Math.random().toString(16).substr(2);
+}
+
+function create_new_password(){
+	return Math.random().toString(36).substr(2);
+}
+
+function get_title(title, text){
+	if(title && title.trim().length > 0)
+		return title.trim();
+	return text.split("\n")[0].trim().substr(0, 50); // First line of text
+}
