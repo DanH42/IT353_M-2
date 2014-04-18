@@ -1,0 +1,17 @@
+{
+	"name": "IT353_M-2",
+	"version": "1.0.0",
+	"description": "Medium project 2 for IT 353",
+	"dependencies": {
+		"express": "3.5.x",
+		"mongolian": "0.1.x"
+	},
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/DanH42/IT353_M-2.git"
+	},
+	"engines": {
+		"node": ">=0.4"
+	}
+}
+
