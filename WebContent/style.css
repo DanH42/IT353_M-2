@@ -134,3 +134,8 @@ header a, header a:visited{
 	text-align: center;
 	padding: .5em;
 }
+
+.twitter
+{
+	float: right;
+}
