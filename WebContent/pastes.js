@@ -119,7 +119,7 @@ function loadPaste(id){
 			var type = "";
 			if(res.type !== "plain")
 				type = "[" + $("#type option[value='" + res.type + "']").text() + "] ";
-			document.title = type + res.title + " - Pastebin";
+			document.title = type + res.title + " - Fakebin";
 
 			var scriptURL = "syntaxhighlighter/scripts/" + brushes[res.type] + ".js";
 			$.getScript(scriptURL, function(){
