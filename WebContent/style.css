@@ -30,7 +30,8 @@ header a, header a:visited{
 #ad{
 	float: left;
 	display: block;
-	max-width: 660px;
+	width: 660px;
+	height: 100px;
 }
 
 .clear{
