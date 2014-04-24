@@ -27,6 +27,13 @@ header a, header a:visited{
 	text-decoration: none;
 }
 
+#ad{
+	float: left;
+	display: block;
+	width: 660px;
+	height: 100px;
+}
+
 .clear{
 	clear: both;
 }

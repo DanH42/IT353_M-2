@@ -19,10 +19,14 @@ var brushes = {
 	"xml": "shBrushXml"
 };
 
+var ads = ["Ads/ad1.gif", "Ads/ad2.gif", "Ads/ad3.gif", "Ads/ad4.gif", "Ads/ad5.gif"];
+
 var intendedAction;
 
 $(function(){
 	getRecentPastes();
+
+	$("#ad").prop("src", ads[Math.floor(Math.random() * ads.length)]);
 
 	var query = getURLQuery();
 	if(query.id){
