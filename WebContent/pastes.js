@@ -19,36 +19,57 @@ var brushes = {
 	"xml": "shBrushXml"
 };
 
-var currentID;
+var intendedAction;
 
 $(function(){
 	getRecentPastes();
 
 	var query = getURLQuery();
 	if(query.id){
-		$("#deleteLink").click(function(){
+		if(query.action == "edit")
+			return editPaste(query.id, getPassword(query.id));
+
+		$("#editLink").click(function(){
+			intendedAction = "edit";
+			$("#modSubmit").val("Edit");
+			$("#editLink").hide();
 			$("#deleteLink").hide();
-			$("#deletePaste").show();
+			$("#modPaste").show();
 			return false;
 		});
 
-		$("#deletePaste").submit(function(e){
+		$("#deleteLink").click(function(){
+			intendedAction = "delete";
+			$("#modSubmit").val("Delete");
+			$("#editLink").hide();
+			$("#deleteLink").hide();
+			$("#modPaste").show();
+			return false;
+		});
+
+		$("#modPaste").submit(function(e){
 			e.preventDefault();
 		
-			var pass = $("#deletePass").val();
-			$.ajax({
-				type: "DELETE",
-				url: "rs/pastes/paste/" + currentID + "/" + encodeURIComponent(pass),
-				contentType: "application/json; charset=utf-8",
-				dataType: "json",
-				success: function(res){
-					if(res && res.success)
-						window.location = ".";
-					else
-						error(res.error || "Unable to delete paste.");
-				},
-				failure: error.bind(this, "Unable to delete paste.")
-			});
+			var pass = $("#modPass").val();
+			if(intendedAction == "delete"){
+				$.ajax({
+					type: "DELETE",
+					url: "rs/pastes/paste/" + query.id + "/" + encodeURIComponent(pass),
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function(res){
+						if(res && res.success)
+							window.location = ".";
+						else
+							error(res.error || "Unable to delete paste.");
+					},
+					failure: error.bind(this, "Unable to delete paste.")
+				});
+			}else if(intendedAction == "edit"){
+				savePassword(query.id, pass);
+				window.location = "?id=" + query.id + "&action=edit";
+			}else
+				error("Unknown error. Please reload the page and try again.");
 		});
 
 		loadPaste(query.id);
@@ -58,28 +79,7 @@ $(function(){
 	$("#newPaste").submit(function(e){
 		e.preventDefault();
 
-		var text = $("#paste").val();
-		var title = $("#title").val();
-		var type = $("#type").val();
-		$.ajax({
-			type: "POST",
-			url: "rs/pastes/new",
-			data: JSON.stringify({
-				title: title,
-				type: type,
-				text: text
-			}),
-			contentType: "application/json; charset=utf-8",
-			dataType: "json",
-			success: function(res){
-				if(res && res.success){
-					savePassword(res.id, res.pass);
-					window.location = "?id=" + res.id;
-				}else
-					error(res.error || "Unable to create new paste.");
-			},
-			failure: error.bind(this, "Unable to create new paste.")
-		});
+		newPaste();
 	});
 });
 
@@ -101,9 +101,82 @@ function getPassword(id){
 	return localStorage[id];
 }
 
-function loadPaste(id){
-	currentID = id;
+function newPaste(){
+	var text = $("#paste").val();
+	var title = $("#title").val();
+	var type = $("#type").val();
+	$.ajax({
+		type: "POST",
+		url: "rs/pastes/new",
+		data: JSON.stringify({
+			title: title,
+			type: type,
+			text: text
+		}),
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(res){
+			if(res && res.success){
+				savePassword(res.id, res.pass);
+				window.location = "?id=" + res.id;
+			}else
+				error(res.error || "Unable to create new paste.");
+		},
+		failure: error.bind(this, "Unable to create new paste.")
+	});
+}
 
+function editPaste(id, pass){
+	$.ajax({
+	    type: "GET",
+	    url: "rs/pastes/paste/" + id,
+	    contentType: "application/json; charset=utf-8",
+	    dataType: "json",
+	    success: function(res){
+	    	if(!res || !res.success)
+	    		return error(res.error || "Unable to load paste.");
+
+			$("#pasteSubmit").val("Update");
+			$("#paste").val(res.text);
+			$("#title").val(res.title);
+			$("#type").val(res.type);
+
+			$("#newPaste").submit(function(e){
+				e.preventDefault();
+
+				var text = $("#paste").val();
+				var title = $("#title").val();
+				var type = $("#type").val();
+				console.log("Sending...");
+				$.ajax({
+					type: "PUT",
+					url: "rs/pastes/paste/" + id + "/" + encodeURIComponent(pass),
+					data: JSON.stringify({
+						title: title,
+						type: type,
+						text: text
+					}),
+					contentType: "application/json; charset=utf-8",
+					dataType: "json",
+					success: function(res){
+						if(res && res.success){
+							// The password should already be saved, but rewrite it just in case.
+							// Maybe in the future, editing a paste might change its password.
+							savePassword(res.id, res.pass);
+							window.location = "?id=" + res.id;
+							console.log("Done");
+						}else
+							error(res.error || "Unable to edit paste.");
+					},
+					failure: error.bind(this, "Unable to edit paste.")
+				});
+			});
+	    },
+	    failure: error.bind(this, "Unable to load paste.")
+	});
+}
+
+function loadPaste(id){
 	$("#newPaste").hide();
 	$("#content").show();
 
@@ -131,7 +204,7 @@ function loadPaste(id){
 
 				var pass = getPassword(res.id);
 				if(pass)
-					$("#deletePass").val(pass);
+					$("#modPass").val(pass);
 
 				var $text = $("#content .text");
 				$text.addClass("brush: " + res.type);

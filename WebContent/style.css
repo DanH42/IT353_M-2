@@ -64,22 +64,22 @@ header a, header a:visited{
 	float: left;
 }
 
-#deleteLink{
+#modLinks{
 	float: right;
 }
 
-#deletePaste{
+#modPaste{
 	display: none;
 	float: right;
 }
 
-#deletePaste input{
+#modPaste input{
 	margin: 0;
 	border: 1px solid gray;
 	border-radius: 0px;
 }
 
-#deletePaste input[type="submit"]{
+#modSubmit{
 	margin-left: -1px;
 }
 

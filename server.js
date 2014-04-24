@@ -118,9 +118,10 @@ app.post('/rs/pastes/new', function(request, response){
 app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 	var text = request.body.text;
 	var id = request.params.id;
-	db.pastes.findOne({id: request.params.id}, function(error, paste){
+	var pass = request.params.pass;
+	db.pastes.findOne({id: id}, function(error, paste){
 		if(paste && !error){
-			if(request.params.pass === paste.pass){
+			if(pass === paste.pass){
 				if(text.trim().length > 0){
 
 					var type = request.body.type;
@@ -144,7 +145,7 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 							response.send({
 								success: true,
 								id: id,
-								pass: deletionPassword
+								pass: paste.pass
 							});
 						}
 					});

@@ -38,16 +38,20 @@
 				<option value="vb">Visual Basic</option>
 				<option value="xml">XML</option>
 			</select>
-			<input type="submit" value="Create" />
+			<input type="submit" id="pasteSubmit" value="Create" />
 		</form>
 		<div id="content">
 			<h2 class="title"></h2>
 			<div class="subhead">
 				<div class="time"></div>
-				<a href="#" id="deleteLink">Delete</a>
-				<form id="deletePaste">
-					<input type="text" id="deletePass" placeholder="Password" /><input type="submit" value="Delete" />
-				</form>
+				<div id="modLinks">
+					<a href="#" id="editLink">Edit</a>
+					<a href="#" id="deleteLink">Delete</a>
+					<form id="modPaste">
+						<!-- The submit button's value should always be changed before it is shown -->
+						<input type="text" id="modPass" placeholder="Password" /><input type="submit" id="modSubmit" value="Modify" />
+					</form>
+				</div>
 				<div class="clear"></div>
 			</div>
 			<pre class="text"></pre>
