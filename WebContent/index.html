@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 	<title>Fakebin</title>
+	<meta charset="UTF-8" />
 	<link rel="stylesheet" type="text/css" href="style.css" />
 	<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shCore.css"/>
 	<link type="text/css" rel="stylesheet" href="syntaxhighlighter/styles/shThemeDefault.css"/>
@@ -19,7 +20,7 @@
 			<h3>Recent Pastes</h3>
 			<div id="recent"></div>
 		</div>
-		<img id="ad" src="about:blank" />
+		<img id="ad" src="about:blank" alt="Advertisement" />
 		<form id="newPaste">
 			<label for="title">Title: </label><input type="text" id="title" /><br />
 			<textarea id="paste" rows="15" cols="20"></textarea><br />
@@ -63,7 +64,7 @@
 		</div>
 		<div class="clear"></div>
 		<div class = "twitter">
-			<a href="https://twitter.com/intent/tweet?button_hashtag=Fakebin&text=Fakebin%20is%20cool!" class="twitter-hashtag-button" data-size="large">Tweet #Fakebin</a>
+			<a href="https://twitter.com/intent/tweet?button_hashtag=Fakebin&amp;text=Fakebin%20is%20cool!" class="twitter-hashtag-button" data-size="large">Tweet #Fakebin</a>
 			<script>!function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');</script>
 		</div>
 	</div>
