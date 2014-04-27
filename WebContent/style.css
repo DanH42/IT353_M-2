@@ -11,6 +11,12 @@ body{
 	border-top-right-radius: 15px;
 }
 
+header a{
+	width: 900px;
+	height: 163px;
+	display: block;
+}
+
 header img{
 	border-top-left-radius: 10px;
 	border-top-right-radius: 10px;
