@@ -19,7 +19,7 @@ var brushes = {
 	"xml": "shBrushXml"
 };
 
-var ads = ["Ads/ad1.gif", "Ads/ad2.gif", "Ads/ad3.gif", "Ads/ad4.gif", "Ads/ad5.gif"];
+var ads = ["Ads/ad1.gif", "Ads/ad2.gif", "Ads/ad3.gif", "Ads/ad4.gif", "Ads/ad5.gif", "Ads/ad6.gif", "Ads/ad7.gif", "Ads/ad8.gif"];
 
 var intendedAction;
 
