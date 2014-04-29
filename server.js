@@ -3,6 +3,7 @@ var app = express();
 var mongo = new (require("mongolian"))({log:{debug:function(){}}});
 var mdb = mongo.db("IT353");
 var db = {};
+
 db.pastes = mdb.collection("pastes");
 
 app.configure(function(){
@@ -11,12 +12,13 @@ app.configure(function(){
 	app.use(express.json());
 });
 
-app.listen(8080);
-
+var server = app.listen(3000);
+var io = require('socket.io').listen(server);
+io.sockets.on('connection', function(){}); 
 // Available highlighting languages
 var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 	"java", "pl", "php", "ps", "py", "ruby", "scala", "sql", "vb", "xml"];
-
+	
 /*
 @GET
 @Path("paste/{id}")
@@ -24,6 +26,10 @@ var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 app.get('/rs/pastes/paste/:id', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
 		if(paste && !error){
+		
+			//socket
+			recent_pastes();
+			
 			response.send({
 				success: true,
 				id: paste.id,
@@ -37,38 +43,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 	});
 });
 
-/*
-@GET
-@Path("recent/{num}")
-*/
-app.get('/rs/pastes/recent/:num', function(request, response){
-	var cursor = db.pastes.find();    // Look up all pastes
-	cursor.sort({updated: -1});       // Sort by creation date
-	cursor.limit(request.params.num); // Limit to max number
-	cursor.toArray(function(error, pastes){
-		if(pastes && !error){
-			var output = [];
-			for(var i = 0; i < pastes.length; i++){
-				var text = pastes[i].text.substr(0, 100);   // Shortened preview
-				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
-				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
-				output.push({
-					type: pastes[i].type,
-					text: text,
-					id: pastes[i].id,
-					title: pastes[i].title,
-					updated: pastes[i].updated
-				});
-			}
 
-			response.send({
-				success: true,
-				pastes: output
-			});
-		}else
-			send_error(response, "Couldn't load any pastes!");
-	});
-});
 
 /*
 @POST
@@ -99,7 +74,10 @@ app.post('/rs/pastes/new', function(request, response){
 			if(error){
 				console.log(error);
 				send_error(response, "Unknown database error.");
-			}else{
+			} else{
+				//socket
+				recent_pastes();
+
 				response.send({
 					success: true,
 					id: id,
@@ -142,6 +120,10 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 							console.log(error);
 							send_error(response, "Unknown database error.");
 						}else{
+						
+							//socket
+							recent_pastes();
+							
 							response.send({
 								success: true,
 								id: id,
@@ -171,6 +153,9 @@ app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
 						console.log(error);
 						send_error(response, "Unknown database error.");
 					}else
+						//socket
+						recent_pastes();
+						
 						response.send({success: true});
 				});
 			}else
@@ -199,4 +184,35 @@ function get_title(title, text){
 	if(title && title.trim().length > 0)
 		return title.trim();
 	return text.split("\n")[0].trim().substr(0, 50); // First line of text
+}
+
+function recent_pastes() {
+	console.log('recent pastes');
+	var cursor = db.pastes.find();    // Look up all pastes
+	cursor.sort({updated: -1});       // Sort by creation date
+	cursor.limit(5); // Limit to max number
+	cursor.toArray(function(error, pastes){
+		console.log(pastes.length);
+		if(pastes && !error){
+			var output = [];
+			for(var i = 0; i < pastes.length; i++){
+				var text = pastes[i].text.substr(0, 100);   // Shortened preview
+				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
+				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
+				output.push({
+					type: pastes[i].type,
+					text: text,
+					id: pastes[i].id,
+					title: pastes[i].title,
+					updated: pastes[i].updated
+				});
+			}
+			console.log(output[0].text);
+			//idk
+			io.sockets.on('connection', function (socket) {
+				io.sockets.emit('recent_pastes', output);
+			});
+		}else
+			send_error(response, "Couldn't load any pastes!");
+	});
 }

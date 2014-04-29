@@ -23,9 +23,15 @@ var ads = ["Ads/ad1.gif", "Ads/ad2.gif", "Ads/ad3.gif", "Ads/ad4.gif", "Ads/ad5.
 
 var intendedAction;
 
-$(function(){
-	getRecentPastes();
 
+$(function(){
+	var socket = io.connect('http://:3000');
+	socket.on('recent_pastes', function (data) {
+		console.log(data);
+		getRecentPastes(data);
+		console.log('recent pastes');
+	});
+	
 	$("#ad").prop("src", ads[Math.floor(Math.random() * ads.length)]);
 
 	var query = getURLQuery();
@@ -86,6 +92,8 @@ $(function(){
 		newPaste();
 	});
 });
+
+
 
 function getURLQuery(){
 	var params = {}
@@ -221,41 +229,29 @@ function loadPaste(id){
 	});
 }
 
-function getRecentPastes(){
-	$.ajax({
-	    type: "GET",
-	    url: "rs/pastes/recent/5",
-	    contentType: "application/json; charset=utf-8",
-	    dataType: "json",
-	    success: function(res){
-	    	if(!res || !res.success)
-	    		return error(res.error || "Unable to load recent pastes.");
-	    	$("#recent").html("");
-	    	for(var i = 0; i < res.pastes.length; i++){
-	    		var $div = $("<div>");
-	    		$div.addClass("recentPaste");
+function getRecentPastes(res){
+   	$("#recent").html("").hide().fadeIn(2000);
+    for(var i = 0; i < res.length; i++){
+    	var $div = $("<div>");
+    	$div.addClass("recentPaste");
+			
+    	var $title = $("<a>");
+	   	$title.addClass("title");
+	   	$title.attr("href", "?id=" + res[i].id);
+	   	$title.text(res[i].title);
+    	$div.append($title);
 
-	    		var $title = $("<a>");
-	    		$title.addClass("title");
-	    		$title.attr("href", "?id=" + res.pastes[i].id);
-	    		$title.text(res.pastes[i].title);
-	    		$div.append($title);
+		var $time = $("<div>");
+	    	$time.addClass("time");
+	    	$time.text(moment(res[i].updated).fromNow());
+	    	$div.append($time);
 
-			var $time = $("<div>");
-	    		$time.addClass("time");
-	    		$time.text(moment(res.pastes[i].updated).fromNow());
-	    		$div.append($time);
-
-			var $text = $("<pre>");
-	    		$text.addClass("text");
-	    		$text.text(res.pastes[i].text);
-	    		$div.append($text);
-
-	    		$("#recent").append($div);
-	    	}
-	    },
-	    failure: error.bind(this, "Unable to load recent pastes.")
-	});
+		var $text = $("<pre>");
+	    	$text.addClass("text");
+	    	$text.text(res[i].text);
+	    	$div.append($text);
+    		$("#recent").append($div);
+	 }
 }
 
 function error(text){
