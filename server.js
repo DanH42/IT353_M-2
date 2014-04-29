@@ -21,6 +21,7 @@ var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 /*
 @GET
 @Path("paste/{id}")
+@Produces("application/json; charset=UTF-8")
 */
 app.get('/rs/pastes/paste/:id', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
@@ -41,6 +42,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 /*
 @GET
 @Path("recent/{num}")
+@Produces("application/json; charset=UTF-8")
 */
 app.get('/rs/pastes/recent/:num', function(request, response){
 	get_recent_pastes(request.params.num, function(error, pastes){
@@ -57,6 +59,8 @@ app.get('/rs/pastes/recent/:num', function(request, response){
 /*
 @POST
 @Path("new")
+@Produces("application/json; charset=UTF-8")
+@Consumes("application/json; charset=UTF-8")
 */
 app.post('/rs/pastes/new', function(request, response){
 	var text = request.body.text;
@@ -100,6 +104,8 @@ app.post('/rs/pastes/new', function(request, response){
 /*
 @PUT
 @Path("paste/{id}")
+@Produces("application/json; charset=UTF-8")
+@Consumes("application/json; charset=UTF-8")
 */
 app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 	var text = request.body.text;
@@ -149,6 +155,7 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 /*
 @DELETE
 @Path("paste/{id}/{pass}")
+@Produces("application/json; charset=UTF-8")
 */
 app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
