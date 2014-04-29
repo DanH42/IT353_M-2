@@ -251,15 +251,15 @@ function getRecentPastes(res){
 		$div.append($title);
 
 		var $time = $("<div>");
-			$time.addClass("time");
-			$time.text(moment(res[i].updated).fromNow());
-			$div.append($time);
+		$time.addClass("time");
+		$time.text(moment(res[i].updated).fromNow());
+		$div.append($time);
 
 		var $text = $("<pre>");
-			$text.addClass("text");
-			$text.text(res[i].text);
-			$div.append($text);
-			$("#recent").append($div);
+		$text.addClass("text");
+		$text.text(res[i].text);
+		$div.append($text);
+		$("#recent").append($div);
 	 }
 }
 
