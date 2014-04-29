@@ -26,10 +26,6 @@ var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 app.get('/rs/pastes/paste/:id', function(request, response){
 	db.pastes.findOne({id: request.params.id}, function(error, paste){
 		if(paste && !error){
-		
-			//socket
-			recent_pastes();
-			
 			response.send({
 				success: true,
 				id: paste.id,
@@ -48,10 +44,7 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 @Path("recent/{num}")
 */
 app.get('/rs/pastes/recent/:num', function(request, response){
-	var cursor = db.pastes.find();    // Look up all pastes
-	cursor.sort({updated: -1});       // Sort by creation date
-	cursor.limit(request.params.num); // Limit to max number
-	cursor.toArray(function(error, pastes){
+	get_recent_pastes(request.params.num, function(error, pastes){
 		if(pastes && !error){
 			var output = [];
 			for(var i = 0; i < pastes.length; i++){
@@ -105,9 +98,8 @@ app.post('/rs/pastes/new', function(request, response){
 			if(error){
 				console.log(error);
 				send_error(response, "Unknown database error.");
-			} else{
-				//socket
-				recent_pastes();
+			}else{
+				send_recent_pastes();
 
 				response.send({
 					success: true,
@@ -151,10 +143,8 @@ app.put('/rs/pastes/paste/:id/:pass', function(request, response){
 							console.log(error);
 							send_error(response, "Unknown database error.");
 						}else{
-						
-							//socket
-							recent_pastes();
-							
+							send_recent_pastes();
+
 							response.send({
 								success: true,
 								id: id,
@@ -183,11 +173,10 @@ app.delete('/rs/pastes/paste/:id/:pass', function(request, response){
 					if(error){
 						console.log(error);
 						send_error(response, "Unknown database error.");
-					}else
-						//socket
-						recent_pastes();
-						
+					}else{
+						send_recent_pastes();
 						response.send({success: true});
+					}
 				});
 			}else
 				send_error(response, "Incorrect password.");
@@ -217,12 +206,15 @@ function get_title(title, text){
 	return text.split("\n")[0].trim().substr(0, 50); // First line of text
 }
 
-function recent_pastes() {
-	console.log('recent pastes');
-	var cursor = db.pastes.find();    // Look up all pastes
-	cursor.sort({updated: -1});       // Sort by creation date
-	cursor.limit(5); // Limit to max number
-	cursor.toArray(function(error, pastes){
+function get_recent_pastes(num, callback){
+	var cursor = db.pastes.find(); // Look up all pastes
+	cursor.sort({updated: -1});    // Sort by creation date
+	cursor.limit(5);               // Limit to max number
+	cursor.toArray(callback);
+}
+
+function send_recent_pastes(){
+	get_recent_pastes(5, function(error, pastes){
 		console.log(pastes.length);
 		if(pastes && !error){
 			var output = [];
