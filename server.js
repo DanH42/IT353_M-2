@@ -14,7 +14,6 @@ app.configure(function(){
 
 var server = app.listen(8080);
 var io = require('socket.io').listen(server);
-io.sockets.on('connection', function(){}); 
 // Available highlighting languages
 var brushes = ["plain", "as3", "bash", "csharp", "cpp", "css", "diff", "js",
 	"java", "pl", "php", "ps", "py", "ruby", "scala", "sql", "vb", "xml"];

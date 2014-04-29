@@ -26,10 +26,8 @@ var intendedAction;
 
 $(function(){
 	var socket = io.connect();
-	socket.on('recent_pastes', function (data) {
-		console.log(data);
+	socket.on('recent_pastes', function (data){
 		getRecentPastes(data);
-		console.log('recent pastes');
 	});
 	
 	$("#ad").prop("src", ads[Math.floor(Math.random() * ads.length)]);
@@ -172,7 +170,6 @@ function editPaste(id, pass){
 				var text = $("#paste").val();
 				var title = $("#title").val();
 				var type = $("#type").val();
-				console.log("Sending...");
 				$.ajax({
 					type: "PUT",
 					url: "rs/pastes/paste/" + id + "/" + encodeURIComponent(pass),
@@ -189,7 +186,6 @@ function editPaste(id, pass){
 							// Maybe in the future, editing a paste might change its password.
 							savePassword(res.id, res.pass);
 							window.location = "?id=" + res.id;
-							console.log("Done");
 						}else
 							error(res.error || "Unable to edit paste.");
 					},
@@ -244,7 +240,6 @@ function loadPaste(id){
 
 function getRecentPastes(res){
    	$("#recent").html("");
-   	console.log("asd", res, "dsa");
 	for(var i = 0; i < res.length; i++){
 		var $div = $("<div>");
 		$div.addClass("recentPaste");
