@@ -230,7 +230,7 @@ function loadPaste(id){
 }
 
 function getRecentPastes(res){
-   	$("#recent").html("").hide().fadeIn(2000);
+   	$("#recent").html("");
     for(var i = 0; i < res.length; i++){
     	var $div = $("<div>");
     	$div.addClass("recentPaste");
