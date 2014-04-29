@@ -218,9 +218,8 @@ function get_recent_pastes(num, callback){
 
 function send_recent_pastes(){
 	get_recent_pastes(5, function(error, pastes){
-		console.log(pastes.length);
 		if(pastes && !error)
-			io.sockets.emit('recent_pastes', output);
+			io.sockets.emit('recent_pastes', pastes);
 		else
 			send_error(response, "Couldn't load any pastes!");
 	});
