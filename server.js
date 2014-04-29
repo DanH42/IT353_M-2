@@ -12,7 +12,7 @@ app.configure(function(){
 	app.use(express.json());
 });
 
-var server = app.listen(3000);
+var server = app.listen(8080);
 var io = require('socket.io').listen(server);
 io.sockets.on('connection', function(){}); 
 // Available highlighting languages
@@ -43,7 +43,38 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 	});
 });
 
+/*
+@GET
+@Path("recent/{num}")
+*/
+app.get('/rs/pastes/recent/:num', function(request, response){
+	var cursor = db.pastes.find();    // Look up all pastes
+	cursor.sort({updated: -1});       // Sort by creation date
+	cursor.limit(request.params.num); // Limit to max number
+	cursor.toArray(function(error, pastes){
+		if(pastes && !error){
+			var output = [];
+			for(var i = 0; i < pastes.length; i++){
+				var text = pastes[i].text.substr(0, 100);   // Shortened preview
+				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
+				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
+				output.push({
+					type: pastes[i].type,
+					text: text,
+					id: pastes[i].id,
+					title: pastes[i].title,
+					updated: pastes[i].updated
+				});
+			}
 
+			response.send({
+				success: true,
+				pastes: output
+			});
+		}else
+			send_error(response, "Couldn't load any pastes!");
+	});
+});
 
 /*
 @POST

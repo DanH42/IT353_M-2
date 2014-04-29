@@ -25,7 +25,7 @@ var intendedAction;
 
 
 $(function(){
-	var socket = io.connect('http://:3000');
+	var socket = io.connect();
 	socket.on('recent_pastes', function (data) {
 		console.log(data);
 		getRecentPastes(data);
@@ -33,6 +33,19 @@ $(function(){
 	});
 	
 	$("#ad").prop("src", ads[Math.floor(Math.random() * ads.length)]);
+
+	$.ajax({
+		type: "GET",
+		url: "rs/pastes/recent/5",
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(res){
+			if(!res || !res.success)
+				return error(res.error || "Unable to load recent pastes.");
+			getRecentPastes(res.pastes);
+		},
+		failure: error.bind(this, "Unable to load recent pastes.")
+	});
 
 	var query = getURLQuery();
 	if(query.id){
@@ -140,13 +153,13 @@ function newPaste(){
 
 function editPaste(id, pass){
 	$.ajax({
-	    type: "GET",
-	    url: "rs/pastes/paste/" + id,
-	    contentType: "application/json; charset=utf-8",
-	    dataType: "json",
-	    success: function(res){
-	    	if(!res || !res.success)
-	    		return error(res.error || "Unable to load paste.");
+		type: "GET",
+		url: "rs/pastes/paste/" + id,
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(res){
+			if(!res || !res.success)
+				return error(res.error || "Unable to load paste.");
 
 			$("#pasteSubmit").val("Update");
 			$("#paste").val(res.text);
@@ -183,8 +196,8 @@ function editPaste(id, pass){
 					failure: error.bind(this, "Unable to edit paste.")
 				});
 			});
-	    },
-	    failure: error.bind(this, "Unable to load paste.")
+		},
+		failure: error.bind(this, "Unable to load paste.")
 	});
 }
 
@@ -193,13 +206,13 @@ function loadPaste(id){
 	$("#content").show();
 
 	$.ajax({
-	    type: "GET",
-	    url: "rs/pastes/paste/" + id,
-	    contentType: "application/json; charset=utf-8",
-	    dataType: "json",
-	    success: function(res){
-	    	if(!res || !res.success)
-	    		return error(res.error || "Unable to load paste.");
+		type: "GET",
+		url: "rs/pastes/paste/" + id,
+		contentType: "application/json; charset=utf-8",
+		dataType: "json",
+		success: function(res){
+			if(!res || !res.success)
+				return error(res.error || "Unable to load paste.");
 
 			var type = "";
 			if(res.type !== "plain")
@@ -224,33 +237,34 @@ function loadPaste(id){
 
 				SyntaxHighlighter.highlight();
 			});
-	    },
-	    failure: error.bind(this, "Unable to load paste.")
+		},
+		failure: error.bind(this, "Unable to load paste.")
 	});
 }
 
 function getRecentPastes(res){
    	$("#recent").html("");
-    for(var i = 0; i < res.length; i++){
-    	var $div = $("<div>");
-    	$div.addClass("recentPaste");
+   	console.log("asd", res, "dsa");
+	for(var i = 0; i < res.length; i++){
+		var $div = $("<div>");
+		$div.addClass("recentPaste");
 			
-    	var $title = $("<a>");
+		var $title = $("<a>");
 	   	$title.addClass("title");
 	   	$title.attr("href", "?id=" + res[i].id);
 	   	$title.text(res[i].title);
-    	$div.append($title);
+		$div.append($title);
 
 		var $time = $("<div>");
-	    	$time.addClass("time");
-	    	$time.text(moment(res[i].updated).fromNow());
-	    	$div.append($time);
+			$time.addClass("time");
+			$time.text(moment(res[i].updated).fromNow());
+			$div.append($time);
 
 		var $text = $("<pre>");
-	    	$text.addClass("text");
-	    	$text.text(res[i].text);
-	    	$div.append($text);
-    		$("#recent").append($div);
+			$text.addClass("text");
+			$text.text(res[i].text);
+			$div.append($text);
+			$("#recent").append($div);
 	 }
 }
 
