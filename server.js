@@ -45,23 +45,9 @@ app.get('/rs/pastes/paste/:id', function(request, response){
 app.get('/rs/pastes/recent/:num', function(request, response){
 	get_recent_pastes(request.params.num, function(error, pastes){
 		if(pastes && !error){
-			var output = [];
-			for(var i = 0; i < pastes.length; i++){
-				var text = pastes[i].text.substr(0, 100);   // Shortened preview
-				text = text.replace(/(\r\n|\n|\r)/gm, " "); // Remove line breaks
-				text = text.replace(/\s+/g, " ").trim();    // Remove extra spaces
-				output.push({
-					type: pastes[i].type,
-					text: text,
-					id: pastes[i].id,
-					title: pastes[i].title,
-					updated: pastes[i].updated
-				});
-			}
-
 			response.send({
 				success: true,
-				pastes: output
+				pastes: pastes
 			});
 		}else
 			send_error(response, "Couldn't load any pastes!");
@@ -209,12 +195,7 @@ function get_recent_pastes(num, callback){
 	var cursor = db.pastes.find(); // Look up all pastes
 	cursor.sort({updated: -1});    // Sort by creation date
 	cursor.limit(5);               // Limit to max number
-	cursor.toArray(callback);
-}
-
-function send_recent_pastes(){
-	get_recent_pastes(5, function(error, pastes){
-		console.log(pastes.length);
+	cursor.toArray(function(error, pastes){
 		if(pastes && !error){
 			var output = [];
 			for(var i = 0; i < pastes.length; i++){
@@ -229,12 +210,18 @@ function send_recent_pastes(){
 					updated: pastes[i].updated
 				});
 			}
-			console.log(output[0].text);
-			//idk
-			io.sockets.on('connection', function (socket) {
-				io.sockets.emit('recent_pastes', output);
-			});
+			callback(error, output);
 		}else
+			callback(error, pastes);
+	});
+}
+
+function send_recent_pastes(){
+	get_recent_pastes(5, function(error, pastes){
+		console.log(pastes.length);
+		if(pastes && !error)
+			io.sockets.emit('recent_pastes', output);
+		else
 			send_error(response, "Couldn't load any pastes!");
 	});
 }
