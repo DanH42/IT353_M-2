@@ -201,7 +201,7 @@ function get_title(title, text){
 function get_recent_pastes(num, callback){
 	var cursor = db.pastes.find(); // Look up all pastes
 	cursor.sort({updated: -1});    // Sort by creation date
-	cursor.limit(5);               // Limit to max number
+	cursor.limit(num);             // Limit to max number
 	cursor.toArray(function(error, pastes){
 		if(pastes && !error){
 			var output = [];
